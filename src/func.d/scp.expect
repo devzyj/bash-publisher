@@ -1,0 +1,51 @@
+#!/usr/bin/expect -f
+
+# author: ZhangYanJiong
+# date: 2020-06-16
+
+# 禁用日志输出
+log_user 0
+
+set timeout 5
+set source [lindex $argv 0]
+set target [lindex $argv 1]
+set password [lindex $argv 2]
+set mode [lindex $argv 3]
+set port [lindex $argv 4]
+
+# 端口为空时设置默认值
+if {$port == ""} {
+    set port 22
+}
+
+# 判断登录方式
+if {$mode == "privateKey"} {
+    # 使用密钥登录
+    spawn scp -r -P $port -i $password $source $target
+} else {
+    # 使用密码登录
+    spawn scp -r -P $port $source $target
+}
+
+expect \
+"(yes/no)?" {
+    send "yes\r"
+    exp_continue
+} " password:" {
+    send "$password\r"
+    exp_continue
+} "* to host" {
+    send_user "Connect faild!\r"
+    exit 1
+} "Permission denied" {
+    send_user "Permission denied!\r"
+    exit 1
+} "No such file or directory" {
+    send_user "No such file or directory!\r"
+    exit 1
+} timeout {
+    send_user "Connect timeout!\r"
+    exit 1
+} eof {
+    exit 0
+}

@@ -1,0 +1,12 @@
+{
+    "name": "devzyj/bash-publisher",
+    "description": "Publishing tools",
+    "keywords": ["bash", "shell", "publisher", "publish", "tools"],
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "require": {},
+    "require-dev": {},
+    "config": {
+        "process-timeout": 1800
+    }
+}
