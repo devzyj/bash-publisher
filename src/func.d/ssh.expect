@@ -37,13 +37,13 @@ expect \
     exp_continue
 } "* to host" {
     send_user "Connect faild!\r"
-    exit 1
+    exit 2
 } "Permission denied" {
     send_user "Permission denied!\r"
-    exit 1
+    exit 3
 } "No such file or directory" {
     send_user "No such file or directory!\r"
-    exit 1
+    exit 4
 } timeout {
     send_user "Connect timeout!\r"
     exit 1

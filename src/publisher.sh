@@ -9,9 +9,6 @@ trap 'exitScript 1' SIGINT
 # 脚本版本号
 version="0.0.1"
 
-# 是否使用 example 配置
-useExample=0
-
 # 脚本所在目录的绝对路径
 rootDir=$(dirname $(readlink -f $0))
 
@@ -22,11 +19,7 @@ funcDir="$rootDir/func.d"
 funcPath="$funcDir/common.sh"
 
 # 配置文件目录
-if [ $useExample -eq 0 ]; then
-    confDir="$rootDir/conf.d"
-else
-    confDir="$rootDir/../example/conf.d"
-fi
+confDir="$rootDir/conf.d"
 
 # 配置文件路径
 confPath="$confDir/common.conf"
@@ -43,8 +36,11 @@ tempDir="$rootDir/temp.d"
 # 归档文件目录
 archiveDir="$rootDir/archive.d"
 
-# 运行时的日志文件路径
-runtimeLogPath="$rootDir/log.d/runtime.log"
+# 日志目录
+logDir="$rootDir/log.d"
+
+# 运行日志文件路径
+runtimeLogPath="$logDir/runtime.log"
 
 # 发布环境
 envName=$1
@@ -59,6 +55,15 @@ repoType=$3
 # repoType = git 或 svn 时，表示分支或标签名称
 # repoType = archive 时，表示归档文件路径，支持的文件类型：tar.gz
 repoValue=$4
+
+# 是否执行应用程序的初始化脚本（Y/N）
+isInitApp=$5
+
+# 是否备份应用程序（Y/N）
+isBackupApp=$6
+
+# 是否发布应用程序（Y/N）
+isPublishApp=$7
 
 # 本次发布的临时目录
 publishTempDir=""
@@ -154,7 +159,6 @@ function init(){
 		exitScript 1
     fi
     
-	
 	# 导入配置文件
 	importFile "$confPath"
 	if [ $? -ne 0 ]; then
@@ -196,7 +200,7 @@ function ensureEnv(){
 	fi
 	
 	# 导入环境配置文件
-	local envConfPath="$envConfDir/env.$envName.conf"
+	local envConfPath="$envConfDir/$envName.conf"
 	importFile "$envConfPath"
 	if [ $? -ne 0 ]; then
 		echo ""
@@ -232,7 +236,7 @@ function ensureApp(){
 	fi
 	
 	# 导入应用程序配置文件
-	local appConfPath="$envConfDir/env.$envName.$appName.conf"
+	local appConfPath="$envConfDir/$envName.$appName.conf"
 	importFile "$appConfPath"
 	if [ $? -ne 0 ]; then
 		echo ""
@@ -411,7 +415,14 @@ function preparePublishByGit(){
 	fi
 	
 	# 解压归档文件
+	echo ""
+	echo "  解压归档文件 ..." | tee -a "$runtimeLogPath"
 	tar -xzf "$archiveFilename"
+    if [ $? -ne 0 ]; then
+		echo ""
+		echoError "  ERROR: 解压归档文件失败。" "$runtimeLogPath"
+		exitScript 1
+	fi
 	
 	# 解压后的归档目录
 	local archiveDir="$publishTempDir/$archiveFolder"
@@ -421,10 +432,15 @@ function preparePublishByGit(){
 	
 	# 判断应用程序初始化脚本是否存在
 	if [ -f "$initScriptPath" ]; then
-		userInput "  是否执行初始化脚本 '$initScriptPath'? [Y/n] " "Y"
-		answer=`strtoupper "$answer"`
-		
-		if [ "$answer" == "YES" ] || [ "$answer" == "Y" ]; then
+        if [ ! -n "$isInitApp" ]; then
+            # 提示用户是否执行初始化脚本
+            echo ""
+            echo "  --------------------------------------------"
+            userInput "  是否执行初始化脚本 '$initScriptPath'? [Y/n] " "Y"
+            isInitApp=`strtoupper "$answer"`
+        fi
+        
+		if [ "$isInitApp" == "YES" ] || [ "$isInitApp" == "Y" ]; then
 			# 执行应用程序初始化脚本
 			echo ""
 			echo "  执行应用程序初始化脚本 ..." | tee -a "$runtimeLogPath"
@@ -504,36 +520,40 @@ function publishApplication(){
 		fi
 		
 		if [ $i -eq 0 ]; then
-			# 首个服务器时，询问是否需要备份应用程序
-			echo ""
-			echo "  -----------------------------------------------"
-			userInput "  是否从 '$serverHost' 备份应用程序到本地? [Y/n] " "Y"
-			answer=`strtoupper "$answer"`
-			
-			if [ "$answer" != "NO" ] && [ "$answer" != "N" ]; then
-				# 从指定服务器上，备份应用程序到本地
-				backupApplicationFromServer "$serverHost"
-				if [ $? -ne 0 ]; then
-					echo ""
-					echoError "  ERROR：备份应用程序失败。" "$runtimeLogPath"
-					exitScript 1
-				fi
-			else
-				echo ""
-				echo "  取消备份！" | tee -a "$runtimeLogPath"
-			fi
-			
-			# 首个服务器时，询问是否开始发布应用程序
-			echo ""
-			echo "  -----------------------------------------------"
-			userInput "  是否开始发布应用程序? [y/N] " "N"
-			answer=`strtoupper "$answer"`
-			
-			if [ "$answer" != "YES" ] && [ "$answer" != "Y" ]; then
-				echo ""
-				echo "  取消发布！" | tee -a "$runtimeLogPath"
-				exitScript 1
-			fi
+            if [ ! -n "$isBackupApp" ]; then
+                # 首个服务器时，询问是否需要备份应用程序
+                echo ""
+                echo "  -----------------------------------------------"
+                userInput "  是否从 '$serverHost' 备份应用程序到本地? [Y/n] " "Y"
+                isBackupApp=`strtoupper "$answer"`
+            fi
+            
+            if [ "$isBackupApp" == "YES" ] || [ "$isBackupApp" == "Y" ]; then
+                # 从指定服务器上，备份应用程序到本地
+                backupApplicationFromServer "$serverHost"
+                if [ $? -ne 0 ]; then
+                    echo ""
+                    echoError "  ERROR：备份应用程序失败。" "$runtimeLogPath"
+                    exitScript 1
+                fi
+            else
+                echo ""
+                echo "  取消备份！" | tee -a "$runtimeLogPath"
+            fi
+            
+            if [ ! -n "$isPublishApp" ]; then
+                # 首个服务器时，询问是否开始发布应用程序
+                echo ""
+                echo "  ----------------------------"
+                userInput "  是否开始发布应用程序? [y/N] " "N"
+                isPublishApp=`strtoupper "$answer"`
+                
+                if [ "$isPublishApp" != "YES" ] && [ "$isPublishApp" != "Y" ]; then
+                    echo ""
+                    echo "  取消发布！" | tee -a "$runtimeLogPath"
+                    exitScript 1
+                fi
+            fi
 		fi
 		
 		# 发布应用程序到指定的服务器
@@ -581,23 +601,26 @@ function backupApplicationFromServer(){
 	local backupName="backup-$appName-$envName-$time.tar.gz"
 	local backupPath="/tmp/$backupName"
 	local backupExclude=(${appBackupExclude[*]})
-	
+    
 	echo ""
 	echo "  从 $serverHost 备份应用程序 ..." | tee -a "$runtimeLogPath"
 	
-	# 拼接打包备份文件的命令
-	local command="cd \"$appDir\"; sudo tar -czf \"$backupPath\""
-	
-	# 添加需要排除的文件或目录
+    # 打包文件命令
+    local tarCommand="sudo tar -czf \"$backupPath\""
+    
+	# 添加打包时需要排除的文件或目录
 	if [ -n "$backupExclude" ]; then
 		for i in "${!backupExclude[@]}"
 		do
-			local command="$command --exclude=\"${backupExclude[$i]}\""
+			local tarCommand="$tarCommand --exclude=\"${backupExclude[$i]}\""
 		done
 	fi
 	
-	local command="$command *;"
+	local tarCommand="$tarCommand *"
 	
+	# 需要在远程服务器上执行的命令
+	local command="cd \"$appDir\" ; $tarCommand ;"
+    
 	# 在远程服务器上打包备份文件
 	echo ""
 	echo "  打包备份文件 ..." | tee -a "$runtimeLogPath"
