@@ -581,7 +581,7 @@ function testSSH(){
     
     echo ""
     echo "  测试 $serverHost 连接 ..." | tee -a "$runtimeLogPath"
-    $funcDir/ssh.expect " " "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    $funcDir/ssh.expect "$sshTimeout" " " "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：测试 $serverHost 连接失败。" "$runtimeLogPath"
@@ -624,7 +624,7 @@ function backupApplicationFromServer(){
 	# 在远程服务器上打包备份文件
 	echo ""
 	echo "  打包备份文件 ..." | tee -a "$runtimeLogPath"
-    $funcDir/ssh.expect "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：打包备份文件失败。" "$runtimeLogPath"
@@ -636,7 +636,7 @@ function backupApplicationFromServer(){
 	echo "  拷贝备份文件 ..." | tee -a "$runtimeLogPath"
 	local source="$username@$serverHost:$backupPath"
 	local target="$archiveDir/$backupName"
-    $funcDir/scp.expect "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    $funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：下载备份文件失败。" "$runtimeLogPath"
@@ -647,7 +647,7 @@ function backupApplicationFromServer(){
 	echo ""
 	echo "  删除备份文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo rm -f $backupPath"
-    $funcDir/ssh.expect "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：删除备份文件失败。" "$runtimeLogPath"
@@ -680,7 +680,7 @@ function publishApplicationToServer(){
 	local source="$releasePath"
 	local targetPath="/tmp/$releaseName"
 	local target="$username@$serverHost:$targetPath"
-	$funcDir/scp.expect "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+	$funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：拷贝发布的文件失败。" "$runtimeLogPath"
@@ -691,7 +691,7 @@ function publishApplicationToServer(){
 	echo ""
 	echo "  解压发布的文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo tar -xzf $targetPath -C $appDir"
-	$funcDir/ssh.expect "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+	$funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：解压发布的文件失败。" "$runtimeLogPath"
@@ -702,7 +702,7 @@ function publishApplicationToServer(){
 	echo ""
 	echo "  删除发布的文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo rm -f $targetPath"
-	$funcDir/ssh.expect "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+	$funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
 		echoError "  ERROR：删除发布的文件失败。" "$runtimeLogPath"

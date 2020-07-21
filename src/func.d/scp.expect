@@ -6,12 +6,12 @@
 # 禁用日志输出
 log_user 0
 
-set timeout 5
-set source [lindex $argv 0]
-set target [lindex $argv 1]
-set password [lindex $argv 2]
-set mode [lindex $argv 3]
-set port [lindex $argv 4]
+set timeout [lindex $argv 0]
+set source [lindex $argv 1]
+set target [lindex $argv 2]
+set password [lindex $argv 3]
+set mode [lindex $argv 4]
+set port [lindex $argv 5]
 
 # 端口为空时设置默认值
 if {$port == ""} {

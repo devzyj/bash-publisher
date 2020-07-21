@@ -18,3 +18,9 @@ repoTypeDefault=0
 
 # 默认的仓库分支名称
 repoValueDefault="master"
+
+# SSH 超时时间（秒）
+sshTimeout=60
+
+# SCP 超时时间（秒）
+scpTimeout=600
