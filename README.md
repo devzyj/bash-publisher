@@ -43,13 +43,13 @@ composer create-project --prefer-dist devzyj/bash-publisher publisher
 ### 运行脚本
 
 ```bash
-sh ./src/publisher.sh
+sudo sh ./src/publisher.sh
 ```
 
 - 使用传参方式
 
 ```bash
-# sh ./src/publisher.sh [ENV] [APP_NAME] [REPO_TYPE] [REPO_VALUE] [IS_INIT_APP] [IS_BACKUP_APP] [IS_PUBLISH_APP]
+# sudo sh ./src/publisher.sh [ENV] [APP_NAME] [REPO_TYPE] [REPO_VALUE] [IS_INIT_APP] [IS_BACKUP_APP] [IS_PUBLISH_APP]
 
 # [ENV]：需要发布到的环境名称；
 # [APP_NAME]：需要发布的应用名称；
@@ -60,7 +60,7 @@ sh ./src/publisher.sh
 # [IS_PUBLISH_APP]：是否发布应用程序（Y/N）
 
 # 使用 GIT 仓库中的 master 分支，将 DemoApp 应用发布到 dev 开发环境中
-sh ./src/publisher.sh dev DemoApp git master Y Y Y
+sudo sh ./src/publisher.sh dev DemoApp git master Y Y Y
 ```
 
 ### 备份应用程序
