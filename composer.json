@@ -4,6 +4,12 @@
     "keywords": ["bash", "shell", "publisher", "publish", "tools"],
     "type": "project",
     "license": "BSD-3-Clause",
+	"authors": [{
+			"name": "ZhangYanJiong",
+			"email": "zhangyanjiong@163.com",
+			"homepage": "http://www.zhangyanjiong.com"
+		}
+	],
     "require": {},
     "require-dev": {},
     "config": {
