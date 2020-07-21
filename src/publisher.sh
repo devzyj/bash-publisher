@@ -7,7 +7,7 @@
 trap 'exitScript 1' SIGINT
 
 # 脚本版本号
-version="0.0.1"
+version="1.0"
 
 # 脚本所在目录的绝对路径
 rootDir=$(dirname $(readlink -f $0))
