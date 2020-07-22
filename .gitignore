@@ -1,5 +1,2 @@
 # windows thumbnail cache
 Thumbs.db
-
-# composer itself is not needed
-composer.phar

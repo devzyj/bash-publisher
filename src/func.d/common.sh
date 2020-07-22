@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# author: ZhangYanJiong
-# date: 2020-06-16
+# link: https://github.com/devzyj/bash-publisher
+# author: JerryZhang <zhangyanjiong@163.com>
 
 # 判断数组中是否存在值
 function inArray(){

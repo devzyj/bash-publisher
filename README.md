@@ -1,12 +1,6 @@
 # bash-publisher
 
-发布工具
-
-# 安装
-
-```bash
-composer create-project --prefer-dist devzyj/bash-publisher publisher
-```
+发布工具，需要安装 `expect` 命令。
 
 # 目录结构
 
@@ -65,4 +59,4 @@ sudo sh ./src/publisher.sh dev DemoApp git master Y Y Y
 
 ### 备份应用程序
 
-在发布时，如果选择备份应用程序，会将 $appServerHost 中的首台服务器上的程序打包，并备份到 ./archive.d 目录中，文件名以 backup- 开头
+在发布时，如果选择备份应用程序，会将 $appServerHost 中的首台服务器上的程序打包，并备份到 ./src/archive.d 目录中，文件名以 backup- 开头

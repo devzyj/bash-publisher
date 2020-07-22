@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# author: ZhangYanJiong
-# date: 2020-06-16
+# link: https://github.com/devzyj/bash-publisher
+# author: JerryZhang <zhangyanjiong@163.com>
 
 # 处理 键盘终端 的退出信号 
 trap 'exitScript 1' SIGINT

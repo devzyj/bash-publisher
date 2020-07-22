@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
-# author: ZhangYanJiong
-# date: 2020-06-16
+# link: https://github.com/devzyj/bash-publisher
+# author: JerryZhang <zhangyanjiong@163.com>
 
 # 禁用日志输出
 log_user 0
