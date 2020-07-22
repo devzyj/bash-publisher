@@ -75,7 +75,7 @@ releaseName=""
 releasePath=""
 
 # 方法：退出脚本
-function exitScript(){
+exitScript(){
     local code=$1
     local before="exitScriptBefore"
     
@@ -92,7 +92,7 @@ function exitScript(){
 }
 
 # 方法：退出脚本前的回调
-function exitScriptBefore(){
+exitScriptBefore(){
     local code=$1
     
     # 删除临时目录
@@ -108,7 +108,7 @@ function exitScriptBefore(){
 }
 
 # 方法：脚本入口
-function main(){
+main(){
     echo "" | tee -a "$runtimeLogPath"
     echo "############################ 应用程序发布工具 v$version - $(date "+%Y-%m-%d %H:%M:%S") ############################" | tee -a "$runtimeLogPath"
 
@@ -138,7 +138,7 @@ function main(){
 }
 
 # 方法：初始化
-function init(){
+init(){
     # 判断函数文件是否存在
     if [ ! -f "$funcPath" ]; then
         local errorMsg="  ERROR：'$funcPath' 不存在。"
@@ -174,7 +174,7 @@ function init(){
 }
 
 # 方法：确定发布环境
-function ensureEnv(){
+ensureEnv(){
     if [ ! -n "$envName" ]; then
         echo ""
         echo "  ------------------------------"
@@ -210,7 +210,7 @@ function ensureEnv(){
 }
 
 # 方法：确定应用程序
-function ensureApp(){
+ensureApp(){
     if [ ! -n "$appName" ]; then
         echo ""
         echo "  ----------------------"
@@ -257,7 +257,7 @@ function ensureApp(){
 }
 
 # 方法：确定仓库类型
-function ensureRepoType(){
+ensureRepoType(){
     if [ ! -n "$repoType" ]; then
         echo ""
         echo "  ----------------------"
@@ -293,7 +293,7 @@ function ensureRepoType(){
 }
 
 # 方法：确定仓库值
-function ensureRepoValue(){
+ensureRepoValue(){
     if [ ! -n "$repoValue" ]; then
         if [ "$repoType" == "archive" ]; then
             echo ""
@@ -333,7 +333,7 @@ function ensureRepoValue(){
 }
 
 # 方法：准备发布内容
-function preparePublish(){
+preparePublish(){
     # 本次发布的临时目录
     publishTempDir="$tempDir/$(date "+%Y%m%d%H%M%S")"
     
@@ -357,7 +357,7 @@ function preparePublish(){
 }
 
 # 方法：使用归档文件准备发布内容
-function preparePublishByArchive(){
+preparePublishByArchive(){
     local atchive="$repoValue"
     local packageName="${atchive##*/}"
     local packagePath="$archiveDir/$packageName"
@@ -380,7 +380,7 @@ function preparePublishByArchive(){
 }
 
 # 方法：使用 GIT 仓库准备发布内容
-function preparePublishByGit(){
+preparePublishByGit(){
     local repoUrl="$appRepo"
     local branch="$repoValue"
     local initScript="$appInitScript"
@@ -472,7 +472,7 @@ function preparePublishByGit(){
 }
 
 # 方法：确认发布信息
-function confirmPublishMessage(){
+confirmPublishMessage(){
     echo ""
     echo "  ------------------ 发布信息 ------------------" | tee -a "$runtimeLogPath"
     echo ""
@@ -496,19 +496,17 @@ function confirmPublishMessage(){
 }
 
 # 方法：发布应用程序
-function publishApplication(){
-    local serverHostList=(${appServerHost[*]})
-    
+publishApplication(){
     # 循环测试 SSH 连接
-    for i in "${!serverHostList[@]}" 
+    for i in "${!appServerHost[@]}" 
     do
-        testSSH "${serverHostList[$i]}"
+        testSSH "${appServerHost[$i]}"
     done
     
     # 循环发布到远程
-    for i in "${!serverHostList[@]}" 
+    for i in "${!appServerHost[@]}" 
     do
-        local serverHost="${serverHostList[$i]}"
+        local serverHost="${appServerHost[$i]}"
         
         # 导入服务器配置文件
         local sshConfPath="$sshConfDir/$serverHost.conf"
@@ -547,12 +545,12 @@ function publishApplication(){
                 echo "  ----------------------------"
                 userInput "  是否开始发布应用程序? [y/N] " "N"
                 isPublishApp=`strtoupper "$answer"`
-                
-                if [ "$isPublishApp" != "YES" ] && [ "$isPublishApp" != "Y" ]; then
-                    echo ""
-                    echo "  取消发布！" | tee -a "$runtimeLogPath"
-                    exitScript 1
-                fi
+            fi
+            
+            if [ "$isPublishApp" != "YES" ] && [ "$isPublishApp" != "Y" ]; then
+                echo ""
+                echo "  取消发布！" | tee -a "$runtimeLogPath"
+                exitScript 1
             fi
         fi
         
@@ -566,7 +564,7 @@ function publishApplication(){
 }
 
 # 方法：测试 SSH 连接
-function testSSH(){
+testSSH(){
     local serverHost="$1"
     
     # 导入服务器配置文件
@@ -594,7 +592,7 @@ function testSSH(){
 }
 
 # 方法：从指定服务器上，备份应用程序到本地
-function backupApplicationFromServer(){
+backupApplicationFromServer(){
     local serverHost="$1"
     local loginMode="$sshLoginMode"
     local username="$sshUsername"
@@ -604,7 +602,6 @@ function backupApplicationFromServer(){
     local time="$(date "+%Y%m%d%H%M%S")"
     local backupName="backup-$appName-$envName-$time.tar.gz"
     local backupPath="/tmp/$backupName"
-    local backupExclude=(${appBackupExclude[*]})
     
     echo ""
     echo "  开始从 $serverHost 备份应用程序到本地 ..." | tee -a "$runtimeLogPath"
@@ -613,10 +610,10 @@ function backupApplicationFromServer(){
     local tarCommand="sudo tar -czf \"$backupPath\""
     
     # 添加打包时需要排除的文件或目录
-    if [ -n "$backupExclude" ]; then
-        for i in "${!backupExclude[@]}"
+    if [ -n "$appBackupExclude" ]; then
+        for i in "${!appBackupExclude[@]}"
         do
-            local tarCommand="$tarCommand --exclude=\"${backupExclude[$i]}\""
+            local tarCommand="$tarCommand --exclude=\"${appBackupExclude[$i]}\""
         done
     fi
     
@@ -665,7 +662,7 @@ function backupApplicationFromServer(){
 }
 
 # 方法：发布应用程序到指定的服务器
-function publishApplicationToServer(){
+publishApplicationToServer(){
     local serverHost="$1"
     local loginMode="$sshLoginMode"
     local username="$sshUsername"

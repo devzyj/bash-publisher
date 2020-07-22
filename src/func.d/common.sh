@@ -4,7 +4,7 @@
 # author: JerryZhang <zhangyanjiong@163.com>
 
 # 判断数组中是否存在值
-function inArray(){
+inArray(){
     local array=($1)
     local value=$2
     
@@ -21,7 +21,7 @@ function inArray(){
 }
 
 # 判断函数是否存在
-function functionExists(){
+functionExists(){
     local name=$1
     
     if [ "`type -t $name`" == "function" ]; then
@@ -34,7 +34,7 @@ function functionExists(){
 }
 
 # 判断命令是否存在
-function commandExists(){
+commandExists(){
     local cmd="$1"
     
     if type "$cmd" >/dev/null 2>&1; then 
@@ -47,7 +47,7 @@ function commandExists(){
 }
 
 # 显示红色文本
-function echoRedText(){
+echoRedText(){
     local message=$1
     local log=$2
     
@@ -59,7 +59,7 @@ function echoRedText(){
 }
 
 # 显示并记录错误信息
-function echoError(){
+echoError(){
     local message=$1
     local log=$2
     
@@ -67,7 +67,7 @@ function echoError(){
 }
 
 # 导入文件
-function importFile(){
+importFile(){
     local file=$1
     
     # 判断需要导入的文件是否存在
@@ -81,7 +81,7 @@ function importFile(){
 }
 
 # 将字符串转化为小写
-function strtolower(){
+strtolower(){
     local str="$1"
     
     echo "$str" | tr 'A-Z' 'a-z'
@@ -89,7 +89,7 @@ function strtolower(){
 }
 
 # 将字符串转化为大写
-function strtoupper(){
+strtoupper(){
     local str="$1"
     
     echo "$str" | tr 'a-z' 'A-Z'
@@ -98,7 +98,7 @@ function strtoupper(){
 
 # 根据数组，显示选择列表，并且等待用户输入。
 # 需要在方法外部定义 $answer 参数，用于接收用户输入的值。
-function userSelect(){
+userSelect(){
     local list=($1)
     local prefix=$2
     local default=$3
@@ -133,7 +133,7 @@ function userSelect(){
 
 # 显示提示信息，并且等待用户输入。
 # 需要在方法外部定义 $answer 参数，用于接收用户输入的值。
-function userInput(){
+userInput(){
     local message="$1"
     local default="$2"
     
@@ -149,7 +149,7 @@ function userInput(){
 }
 
 # 克隆 GIT 仓库
-function gitClone(){
+gitClone(){
     local repo="$1"
     local branch="$2"
     local target="$3"
