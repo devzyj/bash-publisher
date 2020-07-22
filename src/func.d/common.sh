@@ -157,3 +157,78 @@ gitClone(){
     git clone -q -b "$branch" "$repo" "$target"
     return $?
 }
+
+# SSH
+funcSSH(){
+    local useExpectCmd=$1
+    local timeout="$2"
+    local command="$3"
+    local host="$4"
+    local username="$5"
+    local password="$6"
+    local mode="$7"
+    local port="$8"
+    
+    # 端口为空时设置默认值
+    if [ ! -n "$port" ]; then
+        local port=22
+    fi
+
+    # 使用 expect 命令
+    if [ $useExpectCmd -eq 1 ]; then
+        local ret=`commandExists "expect"`
+        if [ "$ret" == "true" ]; then
+            $funcDir/ssh.expect "$timeout" "$command" "$host" "$username" "$password" "$mode" "$port" >> "$runtimeLogPath" 2>&1
+            return $?
+        fi
+    fi
+    
+    # 使用 ssh 命令
+    # 判断登录方式
+    if [ "$mode" == "privateKey" ]; then
+        # 使用密钥登录
+        ssh -o ConnectTimeout=$timeout -p $port -i $password -l $username $host "$command"
+        return $?
+    fi
+    
+    # 使用密码登录
+    ssh -o ConnectTimeout=$timeout -p $port -l $username $host "$command"
+    return $?
+}
+
+# SCP
+funcSCP(){
+    local useExpectCmd=$1
+    local timeout="$2"
+    local source="$3"
+    local target="$4"
+    local password="$5"
+    local mode="$6"
+    local port="$7"
+    
+    # 端口为空时设置默认值
+    if [ ! -n "$port" ]; then
+        local port=22
+    fi
+
+    # 使用 expect 命令
+    if [ $useExpectCmd -eq 1 ]; then
+        local ret=`commandExists "expect"`
+        if [ "$ret" == "true" ]; then
+            $funcDir/scp.expect "$timeout" "$source" "$target" "$password" "$mode" "$port" >> "$runtimeLogPath" 2>&1
+            return $?
+        fi
+    fi
+    
+    # 使用 scp 命令
+    # 判断登录方式
+    if [ "$mode" == "privateKey" ]; then
+        # 使用密钥登录
+        scp -r -o ConnectTimeout=$timeout -P $port -i $password $source $target
+        return $?
+    fi
+    
+    # 使用密码登录
+    scp -r -o ConnectTimeout=$timeout -P $port $source $target
+    return $?
+}

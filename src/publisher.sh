@@ -151,20 +151,21 @@ init(){
     # 导入函数文件
     . "$funcPath"
     
-    # 检查 `expect` 函数是否存在
-    local ret=`commandExists "expect"`
-    if [ "$ret" != "true" ]; then
-        echo ""
-        echoError "  ERROR：命令 'expect' 不存在。" "$runtimeLogPath"
-        exitScript 1
-    fi
-    
     # 导入配置文件
     importFile "$confPath"
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：配置文件 '$confPath' 不存在。" "$runtimeLogPath"
         exitScript 1
+    fi
+    
+    # 检查 `expect` 命令是否存在
+    if [ $useExpectCmd -eq 1 ]; then
+        local ret=`commandExists "expect"`
+        if [ "$ret" != "true" ]; then
+            echo ""
+            echoError "  Warning：缺少 'expect' 命令，可以设置 common.conf 中的 \$useExpectCmd=0 禁用该功能。" "$runtimeLogPath"
+        fi
     fi
     
     # 创建存放临时文件的目录
@@ -585,7 +586,8 @@ testSSH(){
     
     echo ""
     echo "  测试 $serverHost 连接 ..." | tee -a "$runtimeLogPath"
-    $funcDir/ssh.expect "$sshTimeout" " " "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSSH $useExpectCmd "$sshTimeout" " " "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：测试 $serverHost 连接失败。" "$runtimeLogPath"
@@ -628,7 +630,8 @@ backupApplicationFromServer(){
     # 在远程服务器上打包备份应用程序
     echo ""
     echo "  打包 $serverHost 中的应用程序 ..." | tee -a "$runtimeLogPath"
-    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSSH $useExpectCmd "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：打包 $serverHost 中的应用程序失败。" "$runtimeLogPath"
@@ -640,7 +643,8 @@ backupApplicationFromServer(){
     echo "  下载 $serverHost 中打包好的文件 ..." | tee -a "$runtimeLogPath"
     local source="$username@$serverHost:$backupPath"
     local target="$archiveDir/$backupName"
-    $funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSCP $useExpectCmd "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：下载 $serverHost 中打包好的文件失败。" "$runtimeLogPath"
@@ -651,7 +655,8 @@ backupApplicationFromServer(){
     echo ""
     echo "  删除 $serverHost 中打包好的文件 ..." | tee -a "$runtimeLogPath"
     local command="sudo rm -f $backupPath"
-    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSSH $useExpectCmd "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：删除 $serverHost 中打包好的文件失败。" "$runtimeLogPath"
@@ -684,7 +689,8 @@ publishApplicationToServer(){
     local source="$releasePath"
     local targetPath="/tmp/$releaseName"
     local target="$username@$serverHost:$targetPath"
-    $funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSCP $useExpectCmd "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：发送文件到 $serverHost 失败。" "$runtimeLogPath"
@@ -695,7 +701,8 @@ publishApplicationToServer(){
     echo ""
     echo "  解压发送到 $serverHost 的文件 ..." | tee -a "$runtimeLogPath"
     local command="sudo tar -xzf $targetPath -C $appDir"
-    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSSH $useExpectCmd "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：解压发送到 $serverHost 的文件失败。" "$runtimeLogPath"
@@ -706,7 +713,8 @@ publishApplicationToServer(){
     echo ""
     echo "  删除发送到 $serverHost 的文件 ..." | tee -a "$runtimeLogPath"
     local command="sudo rm -f $targetPath"
-    $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    funcSSH $useExpectCmd "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
+    
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR：删除发送到 $serverHost 的文件失败。" "$runtimeLogPath"
