@@ -1,16 +1,16 @@
 # link: https://github.com/devzyj/bash-publisher
 # author: JerryZhang <zhangyanjiong@163.com>
 
-# 开发环境 - bash-publisher 应用程序 - 配置文件
+# XXXX环境 - XXXX应用程序 - 配置文件
 
 # 应用程序服务器地址
-appServerHost=("10.111.222.101" "10.111.222.102")
+appServerHost=("127.0.0.1" "localhost")
 
 # 应用程序所在目录
 appServerDir="/var/www/bash-publisher"
 
 # 备份时，需要排除的文件或目录
-appBackupExclude=("src/log.d" "src/temp.d")
+appBackupExclude=("exclude.txt" "exclude")
 
 # 应用程序仓库地址
 appRepo="https://github.com/devzyj/bash-publisher.git"
@@ -19,7 +19,7 @@ appRepo="https://github.com/devzyj/bash-publisher.git"
 # 如果设置了该值，而且文件存在，并且仓库类型不为 archive 时，则会执行脚本
 # 脚本运行时会传入 $envNames 中选中的值，例如：prod
 # 脚本位置是以应用程序根目录为准的相对路径
-appInitScript=""
+appInitScript="init.sh"
 
 
 # 以下可以覆盖 `[ENV].conf` 中的相关配置

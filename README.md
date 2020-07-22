@@ -21,25 +21,25 @@
     - $envNames：环境列表，使用空格分隔多个，默认为：dev(开发)、test(测试)、prod(生产)
     - $appNames：应用列表，使用空格分隔多个，需要修改成项目名称，例如：("DemoApp" "DemoApp2")
 
-- 将 ./src/conf.d/env.d/env.conf-example 改名为 ./src/conf.d/env.d/dev.conf
+- 将 ./src/conf.d/env.d/[ENV].conf-example 改名为 ./src/conf.d/env.d/dev.conf
     - 文件名 dev.conf 中的 `dev` 为 common.conf 中 $envNames 列表中的某一个值
     - 修改 dev.conf 文件用于覆盖 common.conf 中的配置内容
 
-- 将 ./src/conf.d/env.d/env.app.conf-example 改名为 ./src/conf.d/env.d/dev.DemoApp.conf
-    - 文件名 dev.DemoApp.conf 中的 `dev` 为 common.conf 文件内 $envNames 列表中的某一个值
-    - 文件名 dev.DemoApp.conf 中的 `DemoApp` 为 common.conf 文件内 $appNames 列表中的某一个值
+- 将 ./src/conf.d/env.d/[ENV].[APP].conf-example 改名为 ./src/conf.d/env.d/dev.DemoApp.conf
+    - 文件名 dev.DemoApp.conf 中的 `dev` 为 common.conf 中 $envNames 列表中的某一个值
+    - 文件名 dev.DemoApp.conf 中的 `DemoApp` 为 common.conf 中 $appNames 列表中的某一个值
     - $appServerHost：应用程序服务器地址，使用空格分隔多个
     - $appServerDir：应用程序所在服务器中的目录
     - $appBackupExclude：备份时，需要排除的文件或目录，使用空格分隔多个
     - $appRepo：应用程序仓库地址
-    - $appInitScript：应用程序初始化脚本，如果不为空，并且文件存在，则运行脚本
+    - $appInitScript：应用程序初始化脚本，如果设置了该值，而且文件存在，并且仓库类型不为 archive 时，则会执行脚本，脚本运行时会传入 $envNames 中选中的值，例如：prod
 
-- 将 ./src/conf.d/ssh.d/127.0.0.1.conf-example 改名为 ./src/conf.d/ssh.d/127.0.0.1.conf
-    - 文件名 127.0.0.1.conf 中的 `127.0.0.1` 为 dev.DemoApp.conf 文件内 $appServerHost 列表中的某一个值
+- 将 ./src/conf.d/ssh.d/[SERVER_HOST].conf-example 改名为 ./src/conf.d/ssh.d/10.111.222.123.conf
+    - 文件名 10.111.222.123.conf 中的 `10.111.222.123` 为 dev.DemoApp.conf 中 $appServerHost 列表中的某一个值
     - $sshPort：端口号
     - $sshUsername：登录用户名
     - $sshLoginMode：登录方式（password: 密码登录；privateKey: 密钥登录）
-    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量为当前路径）
+    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录）
 
 ### 运行脚本
 
