@@ -34,7 +34,16 @@
     - $appRepo：应用程序仓库地址
     - $appInitScript：应用程序初始化脚本，如果不为空，并且文件存在，则运行脚本
 
+- 将 ./src/conf.d/ssh.d/127.0.0.1.conf-example 改名为 ./src/conf.d/ssh.d/127.0.0.1.conf
+    - 文件名 127.0.0.1.conf 中的 `127.0.0.1` 为 dev.DemoApp.conf 文件内 $appServerHost 列表中的某一个值
+    - $sshPort：端口号
+    - $sshUsername：登录用户名
+    - $sshLoginMode：登录方式（password: 密码登录；privateKey: 密钥登录）
+    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量为当前路径）
+
 ### 运行脚本
+
+- 根据提示，逐步执行
 
 ```bash
 sudo sh ./src/publisher.sh

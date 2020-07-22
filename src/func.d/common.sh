@@ -49,8 +49,13 @@ function commandExists(){
 # 显示红色文本
 function echoRedText(){
 	local message=$1
+	local log=$2
 	
 	echo -e "\033[31m$message\033[0m"
+	
+	if [ -n "$log" ]; then
+		echo "$message" >> "$log"
+	fi
 }
 
 # 显示并记录错误信息
@@ -58,11 +63,7 @@ function echoError(){
 	local message=$1
 	local log=$2
 	
-	echoRedText "$message"
-	
-	if [ -n "$log" ]; then
-		echo "$message" >> "$log"
-	fi
+	echoRedText "$message" "$log"
 }
 
 # 导入文件

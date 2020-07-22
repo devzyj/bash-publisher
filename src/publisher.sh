@@ -476,20 +476,20 @@ function confirmPublishMessage(){
 	echo ""
 	echo "  ------------------ 发布信息 ------------------" | tee -a "$runtimeLogPath"
 	echo ""
-	echoError "      环境名称：$envName" "$runtimeLogPath"
-	echoError "      应用名称：$appName" "$runtimeLogPath"
-	echoError "    应用服务器：${appServerHost[*]}" "$runtimeLogPath"
-	echoError "      应用目录：$appServerDir" "$runtimeLogPath"
-	echoError "      仓库类型：$repoType" "$runtimeLogPath"
+	echoRedText "      环境名称：$envName" "$runtimeLogPath"
+	echoRedText "      应用名称：$appName" "$runtimeLogPath"
+	echoRedText "    应用服务器：${appServerHost[*]}" "$runtimeLogPath"
+	echoRedText "      应用目录：$appServerDir" "$runtimeLogPath"
+	echoRedText "      仓库类型：$repoType" "$runtimeLogPath"
 	
 	if [ "$repoType" != "archive" ]; then
-		echoError "      仓库地址：$appRepo" "$runtimeLogPath"
-		echoError "  仓库分支名称：$repoValue" "$runtimeLogPath"
+		echoRedText "      仓库地址：$appRepo" "$runtimeLogPath"
+		echoRedText "  仓库分支名称：$repoValue" "$runtimeLogPath"
 	else
-		echoError "  归档文件路径：$repoValue" "$runtimeLogPath"
+		echoRedText "  归档文件路径：$repoValue" "$runtimeLogPath"
 	fi
 	
-	echoError "       Release：$releasePath" "$runtimeLogPath"
+	echoRedText "       Release：$releasePath" "$runtimeLogPath"
 	
 	echo ""
 	echo "  ------------------ 发布信息 ------------------" | tee -a "$runtimeLogPath"
@@ -524,7 +524,7 @@ function publishApplication(){
                 # 首个服务器时，询问是否需要备份应用程序
                 echo ""
                 echo "  -----------------------------------------------"
-                userInput "  是否从 '$serverHost' 备份应用程序到本地? [Y/n] " "Y"
+                userInput "  是否从 $serverHost 备份应用程序到本地? [Y/n] " "Y"
                 isBackupApp=`strtoupper "$answer"`
             fi
             
@@ -559,6 +559,10 @@ function publishApplication(){
 		# 发布应用程序到指定的服务器
 		publishApplicationToServer "$serverHost"
 	done
+    
+	# 成功发布应用程序到所有服务器
+	echo ""
+	echo "  成功发布应用程序到所有服务器！" | tee -a "$runtimeLogPath"
 }
 
 # 方法：测试 SSH 连接
@@ -603,7 +607,7 @@ function backupApplicationFromServer(){
 	local backupExclude=(${appBackupExclude[*]})
     
 	echo ""
-	echo "  从 $serverHost 备份应用程序 ..." | tee -a "$runtimeLogPath"
+	echo "  开始从 $serverHost 备份应用程序到本地 ..." | tee -a "$runtimeLogPath"
 	
     # 打包文件命令
     local tarCommand="sudo tar -czf \"$backupPath\""
@@ -621,36 +625,36 @@ function backupApplicationFromServer(){
 	# 需要在远程服务器上执行的命令
 	local command="cd \"$appDir\" ; $tarCommand ;"
     
-	# 在远程服务器上打包备份文件
+	# 在远程服务器上打包备份应用程序
 	echo ""
-	echo "  打包备份文件 ..." | tee -a "$runtimeLogPath"
+	echo "  打包 $serverHost 中的应用程序 ..." | tee -a "$runtimeLogPath"
     $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：打包备份文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：打包 $serverHost 中的应用程序失败。" "$runtimeLogPath"
 		exitScript 1
 	fi
 	
-	# 远程拷贝备份文件到本地
+	# 拷贝远程服务器上的备份文件到本地
 	echo ""
-	echo "  拷贝备份文件 ..." | tee -a "$runtimeLogPath"
+	echo "  下载 $serverHost 中打包好的文件 ..." | tee -a "$runtimeLogPath"
 	local source="$username@$serverHost:$backupPath"
 	local target="$archiveDir/$backupName"
     $funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：下载备份文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：下载 $serverHost 中打包好的文件失败。" "$runtimeLogPath"
 		exitScript 1
 	fi
 	
 	# 在远程服务器上删除备份文件
 	echo ""
-	echo "  删除备份文件 ..." | tee -a "$runtimeLogPath"
+	echo "  删除 $serverHost 中打包好的文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo rm -f $backupPath"
     $funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：删除备份文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：删除 $serverHost 中打包好的文件失败。" "$runtimeLogPath"
 		exitScript 1
 	fi
 	
@@ -674,43 +678,43 @@ function publishApplicationToServer(){
 	echo ""
 	echo "  开始发布应用程序到 $serverHost ..." | tee -a "$runtimeLogPath"
 	
-	# 拷贝发布的文件到远程
+	# 拷贝需要发布的文件到远程服务器
 	echo ""
-	echo "  拷贝发布的文件 ..." | tee -a "$runtimeLogPath"
+	echo "  发送文件到 $serverHost ..." | tee -a "$runtimeLogPath"
 	local source="$releasePath"
 	local targetPath="/tmp/$releaseName"
 	local target="$username@$serverHost:$targetPath"
 	$funcDir/scp.expect "$scpTimeout" "$source" "$target" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：拷贝发布的文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：发送文件到 $serverHost 失败。" "$runtimeLogPath"
 		exitScript 1
 	fi
 	
-	# 远程解压发布的文件
+	# 解压 发送到远程服务器的文件
 	echo ""
-	echo "  解压发布的文件 ..." | tee -a "$runtimeLogPath"
+	echo "  解压发送到 $serverHost 的文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo tar -xzf $targetPath -C $appDir"
 	$funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：解压发布的文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：解压发送到 $serverHost 的文件失败。" "$runtimeLogPath"
 		exitScript 1
 	fi
 	
-	# 远程删除发布的文件
+	# 删除 发送到远程服务器的文件
 	echo ""
-	echo "  删除发布的文件 ..." | tee -a "$runtimeLogPath"
+	echo "  删除发送到 $serverHost 的文件 ..." | tee -a "$runtimeLogPath"
 	local command="sudo rm -f $targetPath"
 	$funcDir/ssh.expect "$sshTimeout" "$command" "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
 	if [ $? -ne 0 ]; then
 		echo ""
-		echoError "  ERROR：删除发布的文件失败。" "$runtimeLogPath"
+		echoError "  ERROR：删除发送到 $serverHost 的文件失败。" "$runtimeLogPath"
 	fi
 	
-	# 发布成功
+	# 发布到远程服务器成功
 	echo ""
-	echo "  发布应用程序成功！" | tee -a "$runtimeLogPath"
+	echo "  发布应用程序到 $serverHost 成功！" | tee -a "$runtimeLogPath"
 	return 0
 }
 
