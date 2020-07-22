@@ -46,13 +46,13 @@
 - 根据提示，逐步执行
 
 ```bash
-sudo sh ./src/publisher.sh
+sudo bash ./src/publisher.sh
 ```
 
 - 使用传参方式
 
 ```bash
-# sudo sh ./src/publisher.sh [ENV] [APP_NAME] [REPO_TYPE] [REPO_VALUE] [IS_INIT_APP] [IS_BACKUP_APP] [IS_PUBLISH_APP]
+# sudo bash ./src/publisher.sh [ENV] [APP_NAME] [REPO_TYPE] [REPO_VALUE] [IS_INIT_APP] [IS_BACKUP_APP] [IS_PUBLISH_APP]
 
 # [ENV]：需要发布到的环境名称；
 # [APP_NAME]：需要发布的应用名称；
@@ -63,7 +63,7 @@ sudo sh ./src/publisher.sh
 # [IS_PUBLISH_APP]：是否发布应用程序（Y/N）
 
 # 使用 GIT 仓库中的 master 分支，将 DemoApp 应用发布到 dev 开发环境中
-sudo sh ./src/publisher.sh dev DemoApp git master Y Y Y
+sudo bash ./src/publisher.sh dev DemoApp git master Y Y Y
 ```
 
 ### 备份应用程序
