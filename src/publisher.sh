@@ -497,16 +497,18 @@ confirmPublishMessage(){
 
 # 方法：发布应用程序
 publishApplication(){
+    local -a serverHostList="(${appServerHost[*]})"
+        
     # 循环测试 SSH 连接
-    for i in "${!appServerHost[@]}" 
+    for i in "${!serverHostList[@]}" 
     do
-        testSSH "${appServerHost[$i]}"
+        testSSH "${serverHostList[$i]}"
     done
     
     # 循环发布到远程
-    for i in "${!appServerHost[@]}" 
+    for i in "${!serverHostList[@]}" 
     do
-        local serverHost="${appServerHost[$i]}"
+        local serverHost="${serverHostList[$i]}"
         
         # 导入服务器配置文件
         local sshConfPath="$sshConfDir/$serverHost.conf"
@@ -602,6 +604,7 @@ backupApplicationFromServer(){
     local time="$(date "+%Y%m%d%H%M%S")"
     local backupName="backup-$appName-$envName-$time.tar.gz"
     local backupPath="/tmp/$backupName"
+    local -a backupExclude="(${appBackupExclude[*]})"
     
     echo ""
     echo "  开始从 $serverHost 备份应用程序到本地 ..." | tee -a "$runtimeLogPath"
@@ -610,10 +613,10 @@ backupApplicationFromServer(){
     local tarCommand="sudo tar -czf \"$backupPath\""
     
     # 添加打包时需要排除的文件或目录
-    if [ -n "$appBackupExclude" ]; then
-        for i in "${!appBackupExclude[@]}"
+    if [ -n "$backupExclude" ]; then
+        for i in "${!backupExclude[@]}"
         do
-            local tarCommand="$tarCommand --exclude=\"${appBackupExclude[$i]}\""
+            local tarCommand="$tarCommand --exclude=\"${backupExclude[$i]}\""
         done
     fi
     
