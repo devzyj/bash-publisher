@@ -159,15 +159,6 @@ init(){
         exitScript 1
     fi
     
-    # 检查 `expect` 命令是否存在
-    if [ $useExpectCmd -eq 1 ]; then
-        local ret=`commandExists "expect"`
-        if [ "$ret" != "true" ]; then
-            echo ""
-            echoError "  Warning：缺少 'expect' 命令，可以设置 common.conf 中的 \$useExpectCmd=0 禁用该功能。" "$runtimeLogPath"
-        fi
-    fi
-    
     # 创建存放临时文件的目录
     if [ ! -d "$tempDir" ]; then
         mkdir "$tempDir"
@@ -266,17 +257,17 @@ ensureRepoType(){
 
         # 显示并选择仓库类型
         echo ""
-        userSelect "${repoTypes[*]}" "  " "$repoTypeDefault"
+        userSelect "${appRepoTypes[*]}" "  " "$appRepoTypeDefault"
         if [ $? -ne 0 ]; then
             exitScript 1
         fi
 
         # 用户选择的仓库类型
-        repoType="${repoTypes[$answer]}"
+        repoType="${appRepoTypes[$answer]}"
     fi
     
     # 判断仓库类型是否存在
-    local result=`inArray "${repoTypes[*]}" "$repoType"`
+    local result=`inArray "${appRepoTypes[*]}" "$repoType"`
     if [ "$result" != "true" ]; then
         echo ""
         echoError "  ERROR：不支持 '$repoType' 仓库类型。" "$runtimeLogPath"
@@ -313,7 +304,7 @@ ensureRepoValue(){
             echo "  您想使用哪个分支进行发布？"
             
             # 用户输入，分支名称
-            userInput "  请输入 [分支名称], 默认 [$repoValueDefault]: " "$repoValueDefault"
+            userInput "  请输入 [分支名称], 默认 [$appRepoValueDefault]: " "$appRepoValueDefault"
             repoValue="$answer"
         fi
     fi
@@ -584,8 +575,17 @@ testSSH(){
     local password="$sshPassword"
     local port="$sshPort"
     
+    local testMsg="测试 $serverHost 连接"
+    if [ $useExpectCmd -eq 1 ]; then
+        local ret=`commandExists "expect"`
+        if [ "$ret" == "true" ]; then
+            local testMsg="$testMsg""（expect）"
+        fi
+    fi
+    
     echo ""
-    echo "  测试 $serverHost 连接 ..." | tee -a "$runtimeLogPath"
+    echo "  $testMsg ..." | tee -a "$runtimeLogPath"
+    
     funcSSH $useExpectCmd "$sshTimeout" " " "$serverHost" "$username" "$password" "$loginMode" "$port" >> "$runtimeLogPath" 2>&1
     
     if [ $? -ne 0 ]; then

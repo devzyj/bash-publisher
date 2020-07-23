@@ -18,31 +18,35 @@
 ### 配置文件
 
 - 将 ./src/conf.d/common.conf-example 改名为 ./src/conf.d/common.conf
-    - $envNames：环境列表，使用空格分隔多个，默认为：dev(开发)、test(测试)、prod(生产)
-    - $appNames：应用列表，使用空格分隔多个，需要修改成项目名称，例如：("DemoApp" "DemoApp2")
-    - $useExpectCmd：当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
-    - $sshTimeout：SSH 超时时间（秒），使用 expect 时，为 expect 中的超时时间
-    - $scpTimeout：SCP 超时时间（秒），使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
+    - $envNames：环境列表，默认为：dev（开发）、test（测试）、prod（生产）
+    - $envNameDefault：默认的环境，$envNames 中的索引值
 
 - 将 ./src/conf.d/env.d/[ENV].conf-example 改名为 ./src/conf.d/env.d/dev.conf
     - 文件名 dev.conf 中的 `dev` 为 common.conf 中 $envNames 列表中的某一个值
-    - 修改 dev.conf 文件用于覆盖 common.conf 中的配置内容
-
+    - $appNames：应用列表，例如：("DemoApp" "DemoApp2")
+    - $appNameDefault：默认的应用程序，$appNames 中的索引值
+    
 - 将 ./src/conf.d/env.d/[ENV].[APP].conf-example 改名为 ./src/conf.d/env.d/dev.DemoApp.conf
     - 文件名 dev.DemoApp.conf 中的 `dev` 为 common.conf 中 $envNames 列表中的某一个值
     - 文件名 dev.DemoApp.conf 中的 `DemoApp` 为 common.conf 中 $appNames 列表中的某一个值
-    - $appServerHost：应用程序服务器地址，使用空格分隔多个
+    - $appServerHost：应用程序服务器地址
     - $appServerDir：应用程序所在服务器中的目录
-    - $appBackupExclude：备份时，需要排除的文件或目录，使用空格分隔多个
-    - $appRepo：应用程序仓库地址
+    - $appBackupExclude：备份时，需要排除的文件或目录
+    - $appRepoTypes：仓库类型（archive：表示归档文件路径）
+    - $appRepoTypeDefault：默认的仓库类型，$appRepoTypes 中的索引值
+    - $appRepo：仓库地址
+    - $appRepoValueDefault：默认的仓库分支名称
     - $appInitScript：应用程序初始化脚本，如果设置了该值，而且文件存在，并且仓库类型不为 archive 时，则会执行脚本，脚本运行时会传入 $envNames 中选中的值，例如：prod
-
+    
 - 将 ./src/conf.d/ssh.d/[SERVER_HOST].conf-example 改名为 ./src/conf.d/ssh.d/10.111.222.123.conf
     - 文件名 10.111.222.123.conf 中的 `10.111.222.123` 为 dev.DemoApp.conf 中 $appServerHost 列表中的某一个值
     - $sshPort：端口号
     - $sshUsername：登录用户名
-    - $sshLoginMode：登录方式（password: 密码登录；privateKey: 密钥登录）
+    - $sshLoginMode：登录方式，password=密码登录；privateKey=密钥登录，密码登录时推荐设置 $useExpectCmd=1
     - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录，修改密钥文件权限：`chmod 600 ./src/conf.d/ssh.d/privateKey`）
+    - $useExpectCmd：当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
+    - $sshTimeout：SSH 超时时间（秒），使用 expect 时，为 expect 中的超时时间
+    - $scpTimeout：SCP 超时时间（秒），使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
 
 ### 运行脚本
 

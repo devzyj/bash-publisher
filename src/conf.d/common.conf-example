@@ -1,36 +1,14 @@
 # link: https://github.com/devzyj/bash-publisher
 # author: JerryZhang <zhangyanjiong@163.com>
 
-# 全局配置文件
+### 全局配置文件
 
 # 支持的环境列表
-envNames=("dev" "test" "prod")
+envNames=(
+    "dev"
+    "test"
+    "prod"
+)
 
 # 默认的环境，`$envNames` 中的索引值
 envNameDefault=0
-
-# 应用程序名称列表
-appNames=("bash-publisher" "bash-publisher2")
-
-# 默认的应用程序，`$appNames` 中的索引值
-appNameDefault=0
-
-# 支持的仓库类型（archive：表示归档文件路径）
-repoTypes=("git" "archive")
-
-# 默认的仓库类型，`$repoTypes` 中的索引值
-repoTypeDefault=0
-
-# 默认的仓库分支名称
-repoValueDefault="master"
-
-# 当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
-useExpectCmd=0
-
-# SSH 超时时间（秒）
-# 使用 expect 时，为 expect 中的超时时间
-sshTimeout=30
-
-# SCP 超时时间（秒）
-# 使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
-scpTimeout=30
