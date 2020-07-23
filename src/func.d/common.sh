@@ -5,7 +5,7 @@
 
 # 判断数组中是否存在值
 inArray(){
-    local -a array="($1)"
+    local array=($1)
     local value=$2
     
     for i in "${!array[@]}"
@@ -99,7 +99,7 @@ strtoupper(){
 # 根据数组，显示选择列表，并且等待用户输入。
 # 需要在方法外部定义 $answer 参数，用于接收用户输入的值。
 userSelect(){
-    local -a list="($1)"
+    local list=($1)
     local prefix=$2
     local default=$3
     

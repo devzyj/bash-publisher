@@ -39,7 +39,7 @@
     - $sshPort：端口号
     - $sshUsername：登录用户名
     - $sshLoginMode：登录方式（password: 密码登录；privateKey: 密钥登录）
-    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录）
+    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录，修改密钥文件权限：`chmod 600 ./src/conf.d/ssh.d/privateKey`）
 
 ### 运行脚本
 

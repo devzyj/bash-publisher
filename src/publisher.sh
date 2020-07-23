@@ -498,7 +498,7 @@ confirmPublishMessage(){
 
 # 方法：发布应用程序
 publishApplication(){
-    local -a serverHostList="(${appServerHost[*]})"
+    local serverHostList=(${appServerHost[*]})
         
     # 循环测试 SSH 连接
     for i in "${!serverHostList[@]}" 
@@ -606,7 +606,7 @@ backupApplicationFromServer(){
     local time="$(date "+%Y%m%d%H%M%S")"
     local backupName="backup-$appName-$envName-$time.tar.gz"
     local backupPath="/tmp/$backupName"
-    local -a backupExclude="(${appBackupExclude[*]})"
+    local backupExclude=(${appBackupExclude[*]})
     
     echo ""
     echo "  开始从 $serverHost 备份应用程序到本地 ..." | tee -a "$runtimeLogPath"
