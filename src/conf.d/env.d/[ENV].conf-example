@@ -21,7 +21,7 @@
 #repoValueDefault=""
 
 # SSH 超时时间（秒）
-#sshTimeout=60
+#sshTimeout=30
 
 # SCP 超时时间（秒）
-#scpTimeout=600
+#scpTimeout=30

@@ -1,6 +1,6 @@
 # bash-publisher
 
-发布工具，需要安装 `expect` 命令。
+发布工具
 
 # 目录结构
 
@@ -20,6 +20,9 @@
 - 将 ./src/conf.d/common.conf-example 改名为 ./src/conf.d/common.conf
     - $envNames：环境列表，使用空格分隔多个，默认为：dev(开发)、test(测试)、prod(生产)
     - $appNames：应用列表，使用空格分隔多个，需要修改成项目名称，例如：("DemoApp" "DemoApp2")
+    - $useExpectCmd：当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
+    - $sshTimeout：SSH 超时时间（秒），使用 expect 时，为 expect 中的超时时间
+    - $scpTimeout：SCP 超时时间（秒），使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
 
 - 将 ./src/conf.d/env.d/[ENV].conf-example 改名为 ./src/conf.d/env.d/dev.conf
     - 文件名 dev.conf 中的 `dev` 为 common.conf 中 $envNames 列表中的某一个值
@@ -49,7 +52,7 @@
 sudo bash ./src/publisher.sh
 ```
 
-- 使用传参方式
+- 传入参数的方式
 
 ```bash
 # sudo bash ./src/publisher.sh [ENV] [APP_NAME] [REPO_TYPE] [REPO_VALUE] [IS_INIT_APP] [IS_BACKUP_APP] [IS_PUBLISH_APP]
@@ -69,3 +72,7 @@ sudo bash ./src/publisher.sh dev DemoApp git master Y Y Y
 ### 备份应用程序
 
 在发布时，如果选择备份应用程序，会将 $appServerHost 中的首台服务器上的程序打包，并备份到 ./src/archive.d 目录中，文件名以 backup- 开头
+
+### Expect 命令
+
+使用 `expect` 命令，可以实现对服务器的自动交互，在使用密码方式登录服务器时，可以自动输入配置好的密码，无需手动输入。

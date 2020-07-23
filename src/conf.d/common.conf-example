@@ -25,12 +25,12 @@ repoTypeDefault=0
 repoValueDefault="master"
 
 # 当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
-useExpectCmd=1
+useExpectCmd=0
 
 # SSH 超时时间（秒）
 # 使用 expect 时，为 expect 中的超时时间
-sshTimeout=60
+sshTimeout=30
 
 # SCP 超时时间（秒）
 # 使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
-scpTimeout=600
+scpTimeout=30
