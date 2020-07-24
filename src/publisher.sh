@@ -384,7 +384,7 @@ preparePublishByGit(){
     # clone 仓库
     echo ""
     echo "  克隆 Git 存储库 ..." | tee -a "$runtimeLogPath"
-    gitClone "$repoUrl" "$branch" "$publishTempDir" >> "$runtimeLogPath" 2>&1
+    git clone -q -b "$branch" "$repoUrl" "$publishTempDir" >> "$runtimeLogPath" 2>&1
     if [ $? -ne 0 ]; then
         echo ""
         echoError "  ERROR: 克隆 Git 存储库失败。" "$runtimeLogPath"

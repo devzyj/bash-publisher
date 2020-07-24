@@ -148,16 +148,6 @@ userInput(){
     return 0
 }
 
-# 克隆 GIT 仓库
-gitClone(){
-    local repo="$1"
-    local branch="$2"
-    local target="$3"
-    
-    git clone -q -b "$branch" "$repo" "$target"
-    return $?
-}
-
 # SSH
 funcSSH(){
     local useExpectCmd=$1
