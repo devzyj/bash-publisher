@@ -43,7 +43,7 @@
     - $sshPort：端口号
     - $sshUsername：登录用户名
     - $sshLoginMode：登录方式，password=密码登录；privateKey=密钥登录，密码登录时推荐设置 $useExpectCmd=1
-    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录，修改密钥文件权限：`chmod 600 ./src/conf.d/ssh.d/privateKey`）
+    - $sshPassword：登录密码（密钥登录时，应该是密钥路径，支持 $sshConfDir 变量，路径为 ./src/conf.d/ssh.d 目录，修改密钥文件权限：`sudo chmod 600 ./src/conf.d/ssh.d/privateKey`）
     - $useExpectCmd：当 expect 命令存在时，是否使用 expect 命令（1=是；0=否）
     - $sshTimeout：SSH 超时时间（秒），使用 expect 时，为 expect 中的超时时间
     - $scpTimeout：SCP 超时时间（秒），使用 expect 时，为 expect 中的超时时间，如果发送或下载文件超时，需要增加超时时间
