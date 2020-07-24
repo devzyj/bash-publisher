@@ -436,7 +436,7 @@ preparePublishByGit(){
             # 执行应用程序初始化脚本
             echo ""
             echo "  执行应用程序初始化脚本 ..." | tee -a "$runtimeLogPath"
-            sh "$initScriptPath" "$envName" >> "$runtimeLogPath" 2>&1
+            bash "$initScriptPath" "$envName" >> "$runtimeLogPath" 2>&1
             if [ $? -ne 0 ]; then
                 echo ""
                 echoError "  ERROR: 应用程序初始化失败。" "$runtimeLogPath"
